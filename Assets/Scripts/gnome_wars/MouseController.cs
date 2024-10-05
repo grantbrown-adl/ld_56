@@ -9,6 +9,13 @@ public class MouseController : MonoBehaviour {
     [SerializeField] private List<Unit> selectedUnits;
     [SerializeField] private GameObject selectionArea;
     [SerializeField] private int scaleMultiplier;
+    [SerializeField] private float formationDistance;
+
+    [SerializeField] private float[] formationDistances;
+    [SerializeField] private int[] formationAmounts;
+    [SerializeField] private int formationRowLength;
+    [SerializeField] private float formationSpacing;
+    [SerializeField] private float noiseAmount;
 
     private void Awake() {
         isDragging = false;
@@ -17,6 +24,11 @@ public class MouseController : MonoBehaviour {
     }
 
     void Update() {
+        HandleMouseLeftClick();
+        HandleMouseRightClick();
+    }
+
+    private void HandleMouseLeftClick() {
         if (Input.GetMouseButtonDown(0)) {
             StartDrag();
         }
@@ -29,6 +41,88 @@ public class MouseController : MonoBehaviour {
             EndDrag();
         }
     }
+
+    private void HandleMouseRightClick() {
+        if (!Input.GetMouseButtonDown(1)) {
+            return;
+        }
+
+        Vector2 mousePosition = GetMouseWorldPosition();
+
+        //List<Vector2> formationPositions = GetFormationPosition(mousePosition, formationDistance, selectedUnits.Count);
+        //List<Vector2> formationPositions = GetFormationPosition(mousePosition, formationDistances, formationAmounts);
+        //int index = 0;
+
+        List<Vector2> formationPositions = GetBoxFormationPositions(mousePosition, selectedUnits.Count, formationRowLength, formationSpacing);
+        int index = 0;
+
+        foreach (Unit unit in selectedUnits) {
+            unit.SetMoveToPosition(formationPositions[index]);
+            index = (index + 1) % formationPositions.Count;
+        }
+    }
+
+    private List<Vector2> GetBoxFormationPositions(Vector2 start, int totalUnits, int rowLength, float spacing) {
+        List<Vector2> positions = new();
+
+        // Calculate number of rows needed
+        int rows = Mathf.CeilToInt((float)totalUnits / rowLength);
+
+        // Position units in rows and columns
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < rowLength; col++) {
+                int currentUnit = row * rowLength + col;
+
+                // Stop if we've added all units
+                if (currentUnit >= totalUnits) {
+                    return positions;
+                }
+
+                float noiseX = Random.Range(-noiseAmount, noiseAmount);
+                float noiseY = Random.Range(-noiseAmount, noiseAmount);
+
+                // Calculate position of each unit based on row and column
+                float xOffset = col * spacing + noiseX;
+                float yOffset = row * spacing + noiseY;
+
+                Vector2 position = new Vector2(start.x + xOffset, start.y - yOffset);
+                positions.Add(position);
+            }
+        }
+
+        return positions;
+    }
+
+    private List<Vector2> GetFormationPosition(Vector2 start, float[] distances, int[] amounts) {
+        List<Vector2> positions = new();
+
+        positions.Add(start);
+
+        for (int i = 0; i < distances.Length; i++) {
+            positions.AddRange(GetFormationPosition(start, distances[i], amounts[i]));
+        }
+
+        return positions;
+    }
+
+    private List<Vector2> GetFormationPosition(Vector2 start, float distance, int amount) {
+        List<Vector2> positions = new();
+
+        for (int i = 0; i < amount; i++) {
+            float angle = i * (360.0f / amount);
+            Vector2 direction = ApplyRotationToVector(new Vector2(1, 0), angle);
+            Vector2 position = start + direction * distance;
+
+            positions.Add(position);
+        }
+
+        return positions;
+    }
+
+    private Vector2 ApplyRotationToVector(Vector2 vector, float angle) {
+        return Quaternion.Euler(0, 0, angle) * vector;
+    }
+
     private bool ShiftPressed => Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
     private bool ControlPressed => Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
 
@@ -46,7 +140,7 @@ public class MouseController : MonoBehaviour {
 
 
     private void HandleUnitSelection(Unit unit) {
-        if (unit.IsSelected) {
+        if (unit.IsSelected && !ShiftPressed) {
             unit.Deselect();
             selectedUnits.Remove(unit);
         } else {
