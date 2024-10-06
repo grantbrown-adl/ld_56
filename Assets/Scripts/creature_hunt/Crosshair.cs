@@ -1,14 +1,30 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Crosshair : MonoBehaviour {
     [SerializeField] Image crosshairImage;
+    [SerializeField] float spreadRadius;
+    [SerializeField] float spreadMultiplier; //2.2 is the sweet spot
+
+    private void Start() {
+        StartCoroutine(SlowUpdate());
+    }
 
     private void Update() {
-        //Vector2 mousePosition = GetMouseWorldPosition();
         Vector2 mousePosition = Input.mousePosition;
-        Vector3 thissy = Camera.main.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, Camera.main.nearClipPlane));
-        crosshairImage.rectTransform.position = thissy;
+        crosshairImage.transform.position = mousePosition;
+        float imageSize = spreadRadius * spreadMultiplier;
+
+        //crosshairImage.sizeDelta = new Vector2(imageSize, imageSize);
+        crosshairImage.transform.localScale = new Vector2(imageSize, imageSize);
+    }
+
+    IEnumerator SlowUpdate() {
+        while (true) {
+            spreadRadius = GameManager.Instance.GunSpread;
+            yield return new WaitForSeconds(0.25f);
+        }
     }
 
     public static Vector3 GetMouseWorldPosition() {

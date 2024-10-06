@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour {
     #region Getters
     public bool IsGameOver { get => _isGameOver; set => _isGameOver = value; }
     public static GameManager Instance { get => _instance; private set => _instance = value; }
+    public float GunSpread { get => gunSpread; set => gunSpread = value; }
 
     #endregion
 
@@ -28,6 +29,9 @@ public class GameManager : MonoBehaviour {
     [Header("Game Settings")]
     [SerializeField] float gameTime;
     [SerializeField] TextMeshProUGUI timeText;
+
+    [Header("Gun Settings")]
+    [SerializeField] float gunSpread;
 
     private void Awake() {
         CreateSingleton();
