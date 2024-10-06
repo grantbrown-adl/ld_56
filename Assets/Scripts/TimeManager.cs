@@ -25,10 +25,14 @@ public class TimeManager : MonoBehaviour {
     private void Update() {
         Time.timeScale = _currentTimeScale;
         if (isPaused || GameManager.Instance.IsGameOver) {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
             if (!GameManager.Instance.IsGameOver) _pausePanel.SetActive(true);
             else if (GameManager.Instance.IsGameOver) _gameOverPanel.SetActive(true);
             _currentTimeScale = 0.0f;
         } else {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Confined;
             _gameOverPanel.SetActive(false);
             _pausePanel.SetActive(false);
             _currentTimeScale = 1.0f;

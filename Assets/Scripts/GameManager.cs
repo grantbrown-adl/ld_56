@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour {
     public static GameManager Instance { get => _instance; private set => _instance = value; }
     public float GunSpread { get => gunSpread; set => gunSpread = value; }
     public float BulletSize { get => bulletSize; set => bulletSize = value; }
+    public int ElapsedTime { get => elapsedTime; set => elapsedTime = value; }
 
     #endregion
 
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour {
 
     [Header("Game Settings")]
     [SerializeField] int gameTime;
+    [SerializeField] int elapsedTime;
     [SerializeField] TextMeshProUGUI timeText;
 
     [Header("Gun Settings")]
@@ -48,7 +50,10 @@ public class GameManager : MonoBehaviour {
     private void Update() {
         if (_isGameOver) return;
 
-        if (gameTime <= 0) { _isGameOver = true; }
+        if (gameTime <= 0) {
+            ScoreManager.Instance.TimeElapsed = elapsedTime;
+            _isGameOver = true;
+        }
     }
 
     public void ModifyTime(int time) {
@@ -58,6 +63,7 @@ public class GameManager : MonoBehaviour {
     IEnumerator UpdateTime() {
         while (!_isGameOver) {
             gameTime--;
+            elapsedTime++;
             timeText.text = $"{gameTime:F0}";
             yield return new WaitForSeconds(1.0f);
         }

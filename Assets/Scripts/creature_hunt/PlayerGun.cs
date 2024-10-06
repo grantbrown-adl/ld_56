@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class PlayerGun : MonoBehaviour {
@@ -61,23 +63,48 @@ public class PlayerGun : MonoBehaviour {
     private Vector2 currentSwayOffset;
     private Vector2 targetSwayOffset;
 
+    [Header("Camera Shake")]
+    [SerializeField] float shakeDuration;
+    [SerializeField] float shakeMagnitude;
+
+    [Header("Bullet stuff")]
+    [SerializeField] int currentBullets;
+    [SerializeField] int maxBullets;
+    [SerializeField] float reloadTime;
+    [SerializeField] bool isReloading;
+
+    [Header("Bullet UI")]
+    [SerializeField] Transform bulletHolder;
+    [SerializeField] GameObject loadedBulletPrefab;
+    [SerializeField] GameObject emptyBulletPrefab;
+    [SerializeField] TextMeshProUGUI reloadText;
+
     private void Awake() {
         CreateSingleton();
     }
 
     private void Start() {
         spreadRadius = GameManager.Instance.GunSpread;
+        if (maxBullets == 0) maxBullets = 6;
+        currentBullets = maxBullets;
+        isReloading = false;
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Confined;
+        reloadText.gameObject.SetActive(false);
 
 
         SetNewTargetSway();
         InvokeRepeating(nameof(SetNewTargetSway), 0.0f, Random.Range(0.5f, 2.0f));
+        UpdateBulletUI();
     }
 
 
     private void Update() {
+        if (GameManager.Instance.IsGameOver || TimeManager.Instance.IsPaused) {
+            return;
+        }
+
         swayTimer += Time.deltaTime;
         swayOffset = Vector3.Lerp(Vector3.zero, swayTarget, swaySpeed * Time.deltaTime);
 
@@ -106,6 +133,25 @@ public class PlayerGun : MonoBehaviour {
         if (Input.GetButtonDown("Fire1")) {
             Shoot();
         }
+
+        if (Input.GetKeyDown(KeyCode.R)) {
+            if (isReloading) {
+                StopCoroutine(Reload());
+            } else {
+                StartCoroutine(Reload());
+            }
+        }
+    }
+
+    IEnumerator Reload() {
+        isReloading = true;
+        while (currentBullets < maxBullets && isReloading) {
+            currentBullets++;
+            UpdateBulletUI();
+            // play reload sound
+            yield return new WaitForSeconds(reloadTime);
+        }
+        isReloading = false;
     }
 
     private void CheckSway() {
@@ -129,6 +175,15 @@ public class PlayerGun : MonoBehaviour {
 
 
     void Shoot() {
+        isReloading = false;
+
+        if (currentBullets <= 0) {
+            // Handle bullet click here
+            return;
+        }
+
+        StartCoroutine(CameraShake.Instance.PerformShake(shakeDuration, shakeMagnitude));
+
         spreadRadius = GameManager.Instance.GunSpread;
 
         float boxSizing = GameManager.Instance.BulletSize;
@@ -147,6 +202,7 @@ public class PlayerGun : MonoBehaviour {
             Debug.DrawRay(shotLocation, direction * bulletRange, Color.red, 10.0f);
 
             if (hit && hit.collider.GetComponent<IHealth>() != null) {
+                ScoreManager.Instance.Hits++;
                 hit.collider.GetComponent<IHealth>().TakeDamage(damage);
                 //Debug.Log("Hit");
                 //if (((1 << hit.collider.gameObject.layer) & targetLayer) != 0) {
@@ -156,6 +212,24 @@ public class PlayerGun : MonoBehaviour {
             }
 
             Instantiate(pelletPrefab, pelletPosition, Quaternion.identity);
+        }
+
+        ScoreManager.Instance.Shots++;
+        currentBullets--;
+        UpdateBulletUI();
+    }
+
+    private void UpdateBulletUI() {
+        reloadText.gameObject.SetActive(currentBullets <= 0);
+
+        foreach (Transform child in bulletHolder) {
+            Destroy(child.gameObject);
+        }
+
+        // Display the current bullet count
+        for (int i = 0; i < maxBullets; i++) {
+            GameObject bulletSprite = i < currentBullets ? loadedBulletPrefab : emptyBulletPrefab;
+            Instantiate(bulletSprite, bulletHolder);
         }
     }
 }

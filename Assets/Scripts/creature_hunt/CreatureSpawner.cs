@@ -7,6 +7,8 @@ public class CreatureSpawner : MonoBehaviour {
     [SerializeField] GameObject[] creaturePrefabs;
     [SerializeField] Transform spawnerParent;
     [SerializeField] float spawnInterval;
+    [SerializeField] float increaseDifficultyAfter = 10.0f;
+    [SerializeField] float difficultyMultiplier = 0.9f;
 
     private void Awake() {
         shouldSpawn = true;
@@ -14,6 +16,7 @@ public class CreatureSpawner : MonoBehaviour {
 
     private void Start() {
         StartCoroutine(SpawnCreature());
+        StartCoroutine(IncreaseDifficulty());
     }
 
     IEnumerator SpawnCreature() {
@@ -27,5 +30,11 @@ public class CreatureSpawner : MonoBehaviour {
             yield return new WaitForSeconds(spawnInterval);
         }
     }
-
+    IEnumerator IncreaseDifficulty() {
+        while (shouldSpawn) {
+            yield return new WaitForSeconds(increaseDifficultyAfter);
+            spawnInterval *= difficultyMultiplier;
+            spawnInterval = Mathf.Max(spawnInterval, 0.5f);
+        }
+    }
 }

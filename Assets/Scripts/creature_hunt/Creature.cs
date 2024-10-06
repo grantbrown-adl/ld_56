@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Creature : MonoBehaviour, IHealth {
     [SerializeField] bool changeDirection;
+    [SerializeField] GameObject bloodSplatter;
 
     [SerializeField] float moveSpeed;
     [SerializeField] float minMoveSpeed;
@@ -72,6 +73,10 @@ public class Creature : MonoBehaviour, IHealth {
         isAlive = false;
         GameManager.Instance.ModifyTime(timeIncrement);
         ScoreManager.Instance.CurrentScore = scoreIncrement;
+        ScoreManager.Instance.Kills++;
+
+        Instantiate(bloodSplatter, transform.position, Quaternion.identity);
+
 
         Destroy(gameObject);
     }

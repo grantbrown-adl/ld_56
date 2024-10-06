@@ -100,6 +100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   changeDirection: 0
+  bloodSplatter: {fileID: 4194327663855474906, guid: fd3775c5efe09f3488928360449376df, type: 3}
   moveSpeed: 2
   minMoveSpeed: 1.5
   maxMoveSpeed: 4
