@@ -6,6 +6,7 @@ public class Crosshair : MonoBehaviour {
     [SerializeField] Image crosshairImage;
     [SerializeField] float spreadRadius;
     [SerializeField] float spreadMultiplier; //2.2 is the sweet spot
+    [SerializeField] float swayMultipler; // 100?? is the sweet spot
 
     private void Start() {
         StartCoroutine(SlowUpdate());
@@ -13,7 +14,8 @@ public class Crosshair : MonoBehaviour {
 
     private void Update() {
         Vector2 mousePosition = Input.mousePosition;
-        crosshairImage.transform.position = mousePosition;
+        //crosshairImage.transform.position = mousePosition + (Vector2)PlayerGun.Instance.SwayOffset;
+        crosshairImage.transform.position = mousePosition + ((Vector2)PlayerGun.Instance.SwayOffset * swayMultipler);
         float imageSize = spreadRadius * spreadMultiplier;
 
         //crosshairImage.sizeDelta = new Vector2(imageSize, imageSize);

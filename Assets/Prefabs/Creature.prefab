@@ -105,6 +105,11 @@ MonoBehaviour:
   maxMoveSpeed: 4
   minDirectionChangeInterval: 3
   maxDirectionChangeInterval: 5
+  currentHealth: 0
+  maxHealth: 1
+  isAlive: 0
+  timeIncrement: 1
+  scoreIncrement: 5
   direction: {x: 0, y: 0}
 --- !u!95 &-7714277493867314073
 Animator:

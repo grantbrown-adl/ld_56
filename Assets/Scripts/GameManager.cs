@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour {
     public bool IsGameOver { get => _isGameOver; set => _isGameOver = value; }
     public static GameManager Instance { get => _instance; private set => _instance = value; }
     public float GunSpread { get => gunSpread; set => gunSpread = value; }
+    public float BulletSize { get => bulletSize; set => bulletSize = value; }
 
     #endregion
 
@@ -27,16 +28,17 @@ public class GameManager : MonoBehaviour {
     [SerializeField] bool _isGameOver = false;
 
     [Header("Game Settings")]
-    [SerializeField] float gameTime;
+    [SerializeField] int gameTime;
     [SerializeField] TextMeshProUGUI timeText;
 
     [Header("Gun Settings")]
     [SerializeField] float gunSpread;
+    [SerializeField] float bulletSize;
 
     private void Awake() {
         CreateSingleton();
         _isGameOver = false;
-        if (gameTime <= 0) { gameTime = 90.0f; }
+        if (gameTime <= 0) { gameTime = 90; }
     }
 
     private void Start() {
@@ -47,6 +49,10 @@ public class GameManager : MonoBehaviour {
         if (_isGameOver) return;
 
         if (gameTime <= 0) { _isGameOver = true; }
+    }
+
+    public void ModifyTime(int time) {
+        gameTime += time;
     }
 
     IEnumerator UpdateTime() {

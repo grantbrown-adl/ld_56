@@ -165,7 +165,6 @@ GameObject:
   - component: {fileID: 80618987}
   - component: {fileID: 80618986}
   - component: {fileID: 80618985}
-  - component: {fileID: 80618984}
   - component: {fileID: 80618988}
   m_Layer: 5
   m_Name: Canvas
@@ -194,19 +193,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &80618984
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 80618982}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c1bb33bbb43ee34fa91132f7076a732, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  crosshairRectTransform: {fileID: 1065606999}
 --- !u!114 &80618985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,8 +268,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fd31da76c4893944bf6525d39b6ff17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  crosshairImage: {fileID: 0}
+  crosshairImage: {fileID: 1065607000}
   spreadRadius: 0
+  spreadMultiplier: 2.2
+  swayMultipler: 100
 --- !u!1 &173308465
 GameObject:
   m_ObjectHideFlags: 0
@@ -1099,9 +1087,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isGameOver: 0
-  gameTime: 90
+  gameTime: 0
   timeText: {fileID: 2117338920}
-  gunSpread: 0
+  gunSpread: 0.5
+  bulletSize: 0.05
 --- !u!1 &1065606998
 GameObject:
   m_ObjectHideFlags: 0
@@ -1223,7 +1212,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 519420031}
   spreadCount: 6
-  spreadAngle: 15
+  damage: 1
   useAngleZ: 0
   useAngleY: 1
   useAngleX: 1
@@ -1236,7 +1225,16 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   pelletPrefab: {fileID: 1547315242216286007, guid: c7d76ff7a9daf04479262ba8fe224041, type: 3}
-  pelletSpeed: 10
+  maxSwayX: 200
+  maxSwayY: 200
+  minSwayX: 50
+  minSwayY: 50
+  swaySpeed: 1.5
+  minSwayInterval: 0.5
+  maxSwayInterval: 1.5
+  swayOffset: {x: 0, y: 0, z: 0}
+  swayAmount: 2
+  smoothFactor: 0.25
 --- !u!1 &1155744340
 GameObject:
   m_ObjectHideFlags: 0

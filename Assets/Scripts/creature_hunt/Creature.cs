@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class Creature : MonoBehaviour {
+public class Creature : MonoBehaviour, IHealth {
     [SerializeField] bool changeDirection;
 
     [SerializeField] float moveSpeed;
@@ -10,7 +10,16 @@ public class Creature : MonoBehaviour {
     [SerializeField] float minDirectionChangeInterval;
     [SerializeField] float maxDirectionChangeInterval;
 
+    [SerializeField] int currentHealth;
+    [SerializeField] int maxHealth;
+    [SerializeField] bool isAlive;
+
+    [SerializeField] int timeIncrement;
+    [SerializeField] int scoreIncrement;
+
     [SerializeField] Vector2 direction;
+
+    public int Health { get => currentHealth; set => currentHealth = value; }
 
     private void Awake() {
         changeDirection = true;
@@ -18,6 +27,8 @@ public class Creature : MonoBehaviour {
 
     private void Start() {
         //StartCoroutine(ChangeDirection());
+        currentHealth = maxHealth;
+        isAlive = true;
 
         direction = transform.position.x < 0 ? Vector2.right : Vector2.left;
         GetComponent<SpriteRenderer>().flipX = transform.position.x > 0;
@@ -45,4 +56,23 @@ public class Creature : MonoBehaviour {
         }
     }
 
+    public void TakeDamage(int damage) {
+        currentHealth -= damage;
+
+        if (currentHealth <= 0f) {
+            Die();
+        }
+    }
+
+    public bool IsAlive() {
+        return isAlive;
+    }
+
+    public void Die() {
+        isAlive = false;
+        GameManager.Instance.ModifyTime(timeIncrement);
+        ScoreManager.Instance.CurrentScore = scoreIncrement;
+
+        Destroy(gameObject);
+    }
 }

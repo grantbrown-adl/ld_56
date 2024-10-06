@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4243682651681134756}
   - component: {fileID: 2057021921804959475}
+  - component: {fileID: -1599097073497372294}
   m_Layer: 0
   m_Name: pellet
   m_TagString: Untagged
@@ -84,3 +85,16 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &-1599097073497372294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547315242216286007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5859a95fa884cd49a7ce5f566118e8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lifetime: 2
