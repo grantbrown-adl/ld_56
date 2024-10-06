@@ -2,6 +2,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MouseController : MonoBehaviour {
+    #region Getters
+    public static MouseController Instance { get => _instance; private set => _instance = value; }
+
+    #endregion
+
+    #region Singleton
+    private static MouseController _instance;
+
+
+    private void CreateSingleton() {
+        if (_instance != null && _instance != this) Destroy(gameObject);
+        else {
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
+    #endregion
+
     private Vector2 dragStart;
     private Vector2 dragEnd;
     private bool isDragging;
@@ -18,6 +36,7 @@ public class MouseController : MonoBehaviour {
     [SerializeField] private float noiseAmount;
 
     private void Awake() {
+        CreateSingleton();
         isDragging = false;
         selectedUnits = new List<Unit>();
         selectionArea.SetActive(false);
@@ -26,6 +45,12 @@ public class MouseController : MonoBehaviour {
     void Update() {
         HandleMouseLeftClick();
         HandleMouseRightClick();
+    }
+
+    public void RemoveUnit(Unit unit) {
+        if (selectedUnits.Contains(unit)) {
+            selectedUnits.Remove(unit);
+        }
     }
 
     private void HandleMouseLeftClick() {
@@ -48,6 +73,11 @@ public class MouseController : MonoBehaviour {
         }
 
         Vector2 mousePosition = GetMouseWorldPosition();
+        Collider2D rightClickLocation = Physics2D.OverlapPoint(mousePosition);
+
+
+        //Unit attackTarget = rightClickLocation != null ? rightClickLocation.GetComponent<Unit>() : null;
+        GameObject attackTarget = (rightClickLocation != null) && (rightClickLocation.GetComponent<IDamageable>() != null) ? rightClickLocation.gameObject : null;
 
         //List<Vector2> formationPositions = GetFormationPosition(mousePosition, formationDistance, selectedUnits.Count);
         //List<Vector2> formationPositions = GetFormationPosition(mousePosition, formationDistances, formationAmounts);
@@ -56,8 +86,9 @@ public class MouseController : MonoBehaviour {
         List<Vector2> formationPositions = GetBoxFormationPositions(mousePosition, selectedUnits.Count, formationRowLength, formationSpacing);
         int index = 0;
 
+
         foreach (Unit unit in selectedUnits) {
-            unit.SetMoveToPosition(formationPositions[index]);
+            unit.SetMoveToPosition(formationPositions[index], attackTarget);
             index = (index + 1) % formationPositions.Count;
         }
     }
@@ -138,7 +169,6 @@ public class MouseController : MonoBehaviour {
         selectedUnits.Clear();
     }
 
-
     private void HandleUnitSelection(Unit unit) {
         if (unit.IsSelected && !ShiftPressed) {
             unit.Deselect();
@@ -180,7 +210,7 @@ public class MouseController : MonoBehaviour {
         foreach (var collider in colliders) {
             Unit unit = collider.GetComponent<Unit>();
 
-            if (!unit.PlayerOwned || unit == null) {
+            if (unit == null || !unit.PlayerOwned) {
                 return;
             }
 

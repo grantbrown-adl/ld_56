@@ -1,3 +1,5 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
@@ -23,14 +25,31 @@ public class GameManager : MonoBehaviour {
     [Header("Game States")]
     [SerializeField] bool _isGameOver = false;
 
+    [Header("Game Settings")]
+    [SerializeField] float gameTime;
+    [SerializeField] TextMeshProUGUI timeText;
 
     private void Awake() {
         CreateSingleton();
         _isGameOver = false;
+        if (gameTime <= 0) { gameTime = 90.0f; }
     }
 
+    private void Start() {
+        StartCoroutine(UpdateTime());
+    }
 
     private void Update() {
         if (_isGameOver) return;
+
+        if (gameTime <= 0) { _isGameOver = true; }
+    }
+
+    IEnumerator UpdateTime() {
+        while (!_isGameOver) {
+            gameTime--;
+            timeText.text = $"{gameTime:F0}";
+            yield return new WaitForSeconds(1.0f);
+        }
     }
 }
